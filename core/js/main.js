@@ -66,11 +66,19 @@ if (typeof HandTracker !== 'undefined') {
          console.log('Hand tracker initialized successfully');
 
          // Setup pinch gesture callbacks for canvas element dragging
+         let initialPinchPos = null;
+         let initialHeadPos = null;
+
          handTracker.onPinchStart = (x, y) => {
             console.log('Pinch started at:', x, y);
             // Convert normalized coordinates (0-1) to canvas coordinates
             let canvasX = x * w;
             let canvasY = y * h;
+
+            // Store initial positions for dragging
+            initialPinchPos = { x: x, y: y };
+            initialHeadPos = webcam.headPos ? [...webcam.headPos] : [0, 1.6, 7];
+
             // Start dragging using existing pen/move logic
             pen.x = canvasX;
             pen.y = canvasY;
@@ -84,14 +92,30 @@ if (typeof HandTracker !== 'undefined') {
             // Convert normalized coordinates to canvas coordinates
             let canvasX = x * w;
             let canvasY = y * h;
+
             // Update pen position for continuous drag
             pen.x = canvasX;
             pen.y = canvasY;
+
+            // If 3D scene is visible, manipulate camera position
+            if (isScene && initialPinchPos && initialHeadPos) {
+               let dx = (x - initialPinchPos.x) * 10; // Horizontal movement
+               let dy = (y - initialPinchPos.y) * 10; // Vertical movement
+
+               // Update head position for 3D scene manipulation
+               webcam.headPos = [
+                  initialHeadPos[0] + dx,
+                  initialHeadPos[1] - dy,
+                  initialHeadPos[2]
+               ];
+            }
          };
 
          handTracker.onPinchEnd = () => {
             console.log('Pinch ended');
             isMove = false;
+            initialPinchPos = null;
+            initialHeadPos = null;
          };
       }
    }).catch(err => {

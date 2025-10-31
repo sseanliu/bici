@@ -20,7 +20,7 @@ class HandTracker {
     // Pinch state
     this.isPinching = false;
     this.pinchPosition = { x: 0, y: 0 };
-    this.pinchThreshold = 0.05; // Distance threshold for pinch detection
+    this.pinchThreshold = 0.08; // Distance threshold for pinch detection (increased for easier detection)
 
     // Callbacks
     this.onPinchStart = null;
@@ -165,20 +165,20 @@ class HandTracker {
       const thumbTip = landmarks[4];
       const indexTip = landmarks[8];
 
-      // Draw larger circles for pinch points
+      // Draw larger circles for pinch points (increased size for better visibility)
       ctx.fillStyle = this.isPinching ? '#FFFF00' : '#00FFFF';
 
       ctx.beginPath();
-      ctx.arc(thumbTip.x * canvasWidth, thumbTip.y * canvasHeight, 8, 0, 2 * Math.PI);
+      ctx.arc(thumbTip.x * canvasWidth, thumbTip.y * canvasHeight, 15, 0, 2 * Math.PI);
       ctx.fill();
 
       ctx.beginPath();
-      ctx.arc(indexTip.x * canvasWidth, indexTip.y * canvasHeight, 8, 0, 2 * Math.PI);
+      ctx.arc(indexTip.x * canvasWidth, indexTip.y * canvasHeight, 15, 0, 2 * Math.PI);
       ctx.fill();
 
-      // Draw line between thumb and index
+      // Draw thicker line between thumb and index
       ctx.strokeStyle = this.isPinching ? '#FFFF00' : '#00FFFF';
-      ctx.lineWidth = 3;
+      ctx.lineWidth = 6;
       ctx.beginPath();
       ctx.moveTo(thumbTip.x * canvasWidth, thumbTip.y * canvasHeight);
       ctx.lineTo(indexTip.x * canvasWidth, indexTip.y * canvasHeight);
