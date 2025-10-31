@@ -56,6 +56,49 @@ if (typeof WebRTCClient !== 'undefined') {
    });
 }
 
+// Initialize Hand Tracker
+let handTracker;
+if (typeof HandTracker !== 'undefined') {
+   handTracker = new HandTracker();
+   handTracker.init().then(success => {
+      if (success) {
+         handTracker.start();
+         console.log('Hand tracker initialized successfully');
+
+         // Setup pinch gesture callbacks for canvas element dragging
+         handTracker.onPinchStart = (x, y) => {
+            console.log('Pinch started at:', x, y);
+            // Convert normalized coordinates (0-1) to canvas coordinates
+            let canvasX = x * w;
+            let canvasY = y * h;
+            // Start dragging using existing pen/move logic
+            pen.x = canvasX;
+            pen.y = canvasY;
+            if (!isMove) {
+               chalktalk.moveStart(canvasX, canvasY);
+            }
+            isMove = true;
+         };
+
+         handTracker.onPinchMove = (x, y) => {
+            // Convert normalized coordinates to canvas coordinates
+            let canvasX = x * w;
+            let canvasY = y * h;
+            // Update pen position for continuous drag
+            pen.x = canvasX;
+            pen.y = canvasY;
+         };
+
+         handTracker.onPinchEnd = () => {
+            console.log('Pinch ended');
+            isMove = false;
+         };
+      }
+   }).catch(err => {
+      console.log('Hand tracker not available:', err);
+   });
+}
+
 let shift3D = 0, t3D = 0, isDrawpad;
 
 let gotoFigure = name => {
@@ -290,12 +333,23 @@ animate = () => {
    let p = webcam.update();
    codeArea.update();
 
+   // Detect hands using webcam video element
+   let handResults = null;
+   if (handTracker && handTracker.isTracking) {
+      handResults = handTracker.detectHands(webcam, time * 1000);
+   }
+
    // Draw remote video if available, otherwise draw webcam
    if (videoUI && videoUI.hasRemoteVideo) {
       videoUI.update();
       ctx.drawImage(videoUI.canvas, 0,0,640,480, 0,0,w,h);
    } else {
       ctx.drawImage(webcam.canvas, 0,0,640,440, 0,0,w,h);
+   }
+
+   // Render hand skeleton overlay on top of video
+   if (handTracker && handResults) {
+      handTracker.renderAllHands(ctx, handResults, w, h);
    }
 
    if (isInfo) {

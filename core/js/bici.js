@@ -38,7 +38,7 @@ let loadProject = projectName => {
          `M4, loadImage, webgl, webcam, trackHead, help,
 	  midi, numberString, pen, keyEvent, matchCurves,
 	  glyphs, chalktalk, codeArea, math, shape, shader,
-	  diagram, webrtc-client, video-ui, main`.split(','));
+	  diagram, webrtc-client, video-ui, hand-tracker, main`.split(','));
    });
 }
 
