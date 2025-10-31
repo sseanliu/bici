@@ -30,17 +30,13 @@ class HandTracker {
 
   async init() {
     try {
-      // Check if MediaPipe is loaded from CDN
-      if (typeof window.vision === 'undefined' || typeof window.vision.HandLandmarker === 'undefined') {
-        console.error('MediaPipe not loaded. Add script tag to HTML.');
-        return false;
-      }
-
-      const { FilesetResolver, HandLandmarker } = window.vision;
+      // Dynamically import MediaPipe from CDN
+      const vision = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs');
+      const { FilesetResolver, HandLandmarker } = vision;
 
       // Load WASM files
       const visionResolver = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
       );
 
       // Create hand landmarker
