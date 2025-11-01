@@ -79,13 +79,18 @@ if (typeof HandTracker !== 'undefined') {
             initialPinchPos = { x: x, y: y };
             initialHeadPos = webcam.headPos ? [...webcam.headPos] : [0, 1.6, 7];
 
-            // Start dragging using existing pen/move logic
-            pen.x = canvasX;
-            pen.y = canvasY;
-            if (!isMove) {
-               chalktalk.moveStart(canvasX, canvasY);
+            if (isScene) {
+               // Enable manual head position control
+               webcam.manualHeadPos = true;
+            } else {
+               // Start dragging using existing pen/move logic
+               pen.x = canvasX;
+               pen.y = canvasY;
+               if (!isMove) {
+                  chalktalk.moveStart(canvasX, canvasY);
+               }
+               isMove = true;
             }
-            isMove = true;
          };
 
          handTracker.onPinchMove = (x, y) => {
@@ -117,6 +122,7 @@ if (typeof HandTracker !== 'undefined') {
             isMove = false;
             initialPinchPos = null;
             initialHeadPos = null;
+            webcam.manualHeadPos = false;
          };
       }
    }).catch(err => {
@@ -254,6 +260,7 @@ canvas2D.addEventListener('mousedown', (e) => {
       isMouseDragging3D = true;
       mouseStart = { x: e.clientX, y: e.clientY };
       initialHeadPosForMouse = webcam.headPos ? [...webcam.headPos] : [0, 1.6, 7];
+      webcam.manualHeadPos = true;
    }
 });
 
@@ -273,11 +280,13 @@ canvas2D.addEventListener('mousemove', (e) => {
 canvas2D.addEventListener('mouseup', () => {
    isMouseDragging3D = false;
    initialHeadPosForMouse = null;
+   webcam.manualHeadPos = false;
 });
 
 canvas2D.addEventListener('mouseleave', () => {
    isMouseDragging3D = false;
    initialHeadPosForMouse = null;
+   webcam.manualHeadPos = false;
 });
 
 // Setup state synchronization after all variables are initialized
