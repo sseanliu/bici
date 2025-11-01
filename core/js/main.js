@@ -89,14 +89,6 @@ if (typeof HandTracker !== 'undefined') {
          };
 
          handTracker.onPinchMove = (x, y) => {
-            // Convert normalized coordinates to canvas coordinates
-            let canvasX = x * w;
-            let canvasY = y * h;
-
-            // Update pen position for continuous drag
-            pen.x = canvasX;
-            pen.y = canvasY;
-
             // If 3D scene is visible, manipulate camera position
             if (isScene && initialPinchPos && initialHeadPos) {
                let dx = (x - initialPinchPos.x) * 10; // Horizontal movement
@@ -108,6 +100,15 @@ if (typeof HandTracker !== 'undefined') {
                   initialHeadPos[1] - dy,
                   initialHeadPos[2]
                ];
+            } else {
+               // 2D canvas dragging
+               // Convert normalized coordinates to canvas coordinates
+               let canvasX = x * w;
+               let canvasY = y * h;
+
+               // Update pen position for continuous drag
+               pen.x = canvasX;
+               pen.y = canvasY;
             }
          };
 
