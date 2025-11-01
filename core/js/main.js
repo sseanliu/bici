@@ -243,6 +243,42 @@ let ctx = canvas2D.getContext('2d');
 let isMove = false, isScene = false, isCode = false, isDrag = false;
 pen.setContext(ctx);
 
+// Mouse dragging for 3D scene
+let isMouseDragging3D = false;
+let mouseStart = { x: 0, y: 0 };
+let initialHeadPosForMouse = null;
+
+canvas2D.addEventListener('mousedown', (e) => {
+   if (isScene) {
+      isMouseDragging3D = true;
+      mouseStart = { x: e.clientX, y: e.clientY };
+      initialHeadPosForMouse = webcam.headPos ? [...webcam.headPos] : [0, 1.6, 7];
+   }
+});
+
+canvas2D.addEventListener('mousemove', (e) => {
+   if (isMouseDragging3D && isScene && initialHeadPosForMouse) {
+      let dx = (e.clientX - mouseStart.x) / w * 10;
+      let dy = (e.clientY - mouseStart.y) / h * 10;
+
+      webcam.headPos = [
+         initialHeadPosForMouse[0] + dx,
+         initialHeadPosForMouse[1] - dy,
+         initialHeadPosForMouse[2]
+      ];
+   }
+});
+
+canvas2D.addEventListener('mouseup', () => {
+   isMouseDragging3D = false;
+   initialHeadPosForMouse = null;
+});
+
+canvas2D.addEventListener('mouseleave', () => {
+   isMouseDragging3D = false;
+   initialHeadPosForMouse = null;
+});
+
 // Setup state synchronization after all variables are initialized
 if (webrtcClient) {
    webrtcClient.onStateUpdate = (fromClientId, state) => {
